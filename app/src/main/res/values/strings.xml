@@ -1,0 +1,8 @@
+<resources>
+    <string name="tfe_sc_app_name" translation_description="Speech commands demo app [CHAR_LIMIT=40]">Smart Wash</string>
+    <string name="channel_name">reminder</string>
+    <string name="channel_description">sends hand wash reminders</string>
+    <string name="notificaton_text">Nothing here yet!</string>
+    <string name="smart_wash">Smart Wash</string>
+    <string name="we_detected_you_last_washed_your_hands_at">We detected you last washed your hands at:</string>
+</resources>
