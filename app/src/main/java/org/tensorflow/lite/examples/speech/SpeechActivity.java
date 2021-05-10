@@ -99,12 +99,12 @@ public class SpeechActivity extends Activity
   private static final int MINIMUM_COUNT = 3;
   private static final long MINIMUM_TIME_BETWEEN_SAMPLES_MS = 30;
   private static final String LABEL_FILENAME = "file:///android_asset/smartwashlabels.txt";
-  private static final String MODEL_FILENAME = "file:///android_asset/conv_actions_frozen.tflite";
+  private static final String MODEL_FILENAME = "file:///android_asset/model-4600.tflite";
 
   private static final String HANDLE_THREAD_NAME = "CameraBackground";
 
   // UI elements.
-  private static final int REQUEST_RECORD_AUDIO = 13;
+  private static final int REQUEST_RECORD_AUDIO = 3;
   private static final String LOG_TAG = SpeechActivity.class.getSimpleName();
   private static final String CHANNEL_ID = "1";
 
@@ -216,7 +216,6 @@ public class SpeechActivity extends Activity
     apiSwitchCompat = findViewById(R.id.api_info_switch);
 
     yesTextView = findViewById(R.id.yes);
-
     apiSwitchCompat.setOnCheckedChangeListener(this);
 
     ViewTreeObserver vto = gestureLayout.getViewTreeObserver();
