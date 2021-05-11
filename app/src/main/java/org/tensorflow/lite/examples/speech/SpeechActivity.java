@@ -97,7 +97,7 @@ public class SpeechActivity extends Activity
   private static final float DETECTION_THRESHOLD = 0.50f;
   private static final int SUPPRESSION_MS = 1500;
   private static final int MINIMUM_COUNT = 3;
-  private static final long MINIMUM_TIME_BETWEEN_SAMPLES_MS = 30;
+  private static final long MINIMUM_TIME_BETWEEN_SAMPLES_MS = 1;
   private static final String LABEL_FILENAME = "file:///android_asset/smartwashlabels.txt";
   private static final String MODEL_FILENAME = "file:///android_asset/model-4600.tflite";
 
@@ -131,6 +131,7 @@ public class SpeechActivity extends Activity
   private ImageView bottomSheetArrowImageView;
 
   private TextView yesTextView;
+  private TextView noTextView;
   private TextView sampleRateTextView, inferenceTimeTextView;
   private ImageView plusImageView, minusImageView;
   private SwitchCompat apiSwitchCompat;
@@ -216,6 +217,7 @@ public class SpeechActivity extends Activity
     apiSwitchCompat = findViewById(R.id.api_info_switch);
 
     yesTextView = findViewById(R.id.yes);
+    noTextView = findViewById(R.id.no);
     apiSwitchCompat.setOnCheckedChangeListener(this);
 
     ViewTreeObserver vto = gestureLayout.getViewTreeObserver();
@@ -271,7 +273,7 @@ public class SpeechActivity extends Activity
       }
     });
     createNotificationChannel();
-    sendNotification();
+    //sendNotification();
   }
 
   @RequiresApi(api = Build.VERSION_CODES.O)
@@ -477,8 +479,7 @@ public class SpeechActivity extends Activity
       Map<Integer, Object> outputMap = new HashMap<>();
       outputMap.put(0, outputScores);
 
-      // Run the model.
-      //TODO might need to change to just run with one input and one output
+      // Run the model
       tfLiteLock.lock();
       try {
         tfLite.runForMultipleInputsOutputs(inputArray, outputMap);
@@ -506,10 +507,12 @@ public class SpeechActivity extends Activity
                     labelIndex = i;
                   }
                 }
-                //TODO change to correct offset
                 switch (labelIndex - 2) {
                   case 0:
                     selectedTextView = yesTextView;
+                    break;
+                  case 1:
+                    selectedTextView = noTextView;
                     break;
                 }
 

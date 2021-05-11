@@ -101,11 +101,20 @@
 
                 <TextView
                     android:id="@+id/yes"
-                    android:layout_width="match_parent"
+                    android:layout_width="205dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/round_corner_text_bg_unselected"
                     android:gravity="center"
                     android:text="Hand Washing"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+                <TextView
+                    android:id="@+id/no"
+                    android:layout_width="205dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/round_corner_text_bg_unselected"
+                    android:gravity="center"
+                    android:text="Background Noise"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
             </LinearLayout>
