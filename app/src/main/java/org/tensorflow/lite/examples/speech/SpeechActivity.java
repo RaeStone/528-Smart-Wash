@@ -76,6 +76,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 import org.tensorflow.lite.Interpreter;
 
@@ -98,6 +100,8 @@ public class SpeechActivity extends Activity
   private static final int SUPPRESSION_MS = 1500;
   private static final int MINIMUM_COUNT = 3;
   private static final long MINIMUM_TIME_BETWEEN_SAMPLES_MS = 1;
+  private static final int SAMPLES_RECORDED = 10;
+  private static final int POSITIVE_SAMPLES_REQUIRED = 5;
   private static final String LABEL_FILENAME = "file:///android_asset/smartwashlabels.txt";
   private static final String MODEL_FILENAME = "file:///android_asset/model-4600.tflite";
 
@@ -143,6 +147,8 @@ public class SpeechActivity extends Activity
   private Handler backgroundHandler;
 
   private LocalDateTime timeOfLastWash;
+  private LinkedBlockingQueue<Boolean> lastSamples;
+  private int positiveSamples;
 
   /** Memory-map the model file in Assets. */
   private static MappedByteBuffer loadModelFile(AssetManager assets, String modelFilename)
@@ -273,6 +279,9 @@ public class SpeechActivity extends Activity
       }
     });
     createNotificationChannel();
+    lastSamples = new LinkedBlockingQueue<Boolean>(SAMPLES_RECORDED);
+    positiveSamples = 0;
+
     //sendNotification();
   }
 
@@ -494,6 +503,7 @@ public class SpeechActivity extends Activity
       lastProcessingTimeMs = new Date().getTime() - startTime;
       runOnUiThread(
           new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
 
@@ -507,14 +517,54 @@ public class SpeechActivity extends Activity
                     labelIndex = i;
                   }
                 }
+                //updates the lastSamples queue along with UI element selection
                 switch (labelIndex - 2) {
                   case 0:
+                    //not full
+                    if (lastSamples.offer(Boolean.TRUE)) {
+                      //count goes up
+                      positiveSamples = positiveSamples + 1;
+                    }
+                    //full, needs to remove head
+                    else {
+                      //last sample was hand washing
+                      try {
+                        if (lastSamples.take()){
+                          //count stays the same
+                        }
+                        else{
+                          //count goes up
+                          positiveSamples = positiveSamples + 1;
+                        }
+                        lastSamples.offer(Boolean.TRUE);
+                      } catch (InterruptedException e) {
+                        e.printStackTrace();
+                      }
+                    }
                     selectedTextView = yesTextView;
                     break;
                   case 1:
+                    if (lastSamples.offer(Boolean.FALSE)) {
+                      //count stays the same
+                    }
+                    else {
+                      try {
+                        if (lastSamples.take()) {
+                          //count goes down
+                          positiveSamples = positiveSamples - 1;
+                        }
+                        else {
+                          //count stays the same
+                        }
+                        lastSamples.offer(Boolean.FALSE);
+                      } catch (InterruptedException e) {
+                        e.printStackTrace();
+                      }
+                    }
                     selectedTextView = noTextView;
                     break;
                 }
+                checkPositiveSamples();
 
                 if (selectedTextView != null) {
                   selectedTextView.setBackgroundResource(R.drawable.round_corner_text_bg_selected);
@@ -617,6 +667,13 @@ public class SpeechActivity extends Activity
       backgroundHandler = null;
     } catch (InterruptedException e) {
       Log.e("amlan", "Interrupted when stopping background thread", e);
+    }
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.O)
+  private void checkPositiveSamples() {
+    if (positiveSamples > POSITIVE_SAMPLES_REQUIRED){
+      updateLastWash();
     }
   }
 
