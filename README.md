@@ -2,7 +2,8 @@
 
 ### Overview
 
-Built off of the TensorFlow Lite Speech Command Recognition example found at https://github.com/tensorflow/examples/tree/master/lite/examples/speech_commands. 
+Built off of the TensorFlow Lite Speech Command Recognition example found at https://github.com/tensorflow/examples/tree/master/lite/examples/speech_commands.
+
 Model built off from https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/speech_commands
 
 ## Build the App using Android Studio
